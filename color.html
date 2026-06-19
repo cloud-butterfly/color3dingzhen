@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WC3 名字颜色生成器</title>
+<style>
+:root {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --card2: #0f3460;
+  --text: #e0e0e0;
+  --accent: #e94560;
+  --accent2: #533483;
+  --border: #2a2a4a;
+  --input-bg: #0d1117;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 头部 */
+.header {
+  text-align: center;
+  padding: 10px 0;
+}
+.header h1 {
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, #e94560, #533483, #e94560);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header p {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* 模式Tab */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--input-bg);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+.mode-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #888;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+.mode-tab.active {
+  background: var(--accent2);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 输入组 */
+.input-group {
+  margin-bottom: 14px;
+}
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+.input-group input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s;
+}
+.input-group input[type="text"]:focus {
+  border-color: var(--accent2);
+}
+
+/* 颜色选择器行 */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.color-row label {
+  font-size: 0.85rem;
+  color: #aaa;
+  min-width: 65px;
+}
+input[type="color"] {
+  width: 40px;
+  height: 36px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  padding: 2px;
+}
+.hex-input {
+  width: 90px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: "Consolas", "Courier New", monospace;
+  text-transform: uppercase;
+  outline: none;
+}
+.hex-input:focus {
+  border-color: var(--accent2);
+}
+
+/* 预设色板 */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.preset-label {
+  width: 100%;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: -4px;
+}
+.preset-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+}
+.preset-dot:hover {
+  transform: scale(1.15);
+  border-color: #fff;
+}
+.preset-dot.active {
+  border-color: #fff;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* 预览区 */
+.preview-box {
+  background: #0a0a14;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-break: break-all;
+}
+.preview-text {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1.6;
+}
+.preview-box .placeholder {
+  color: #444;
+  font-size: 1rem;
+}
+
+/* WC3 代码输出 */
+.code-box {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.8rem;
+  color: #aaa;
+  word-break: break-all;
+  line-height: 1.6;
+  max-height: 120px;
+  overflow-y: auto;
+  position: relative;
+  user-select: all;
+}
+
+/* 按钮 */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: var(--accent2);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #6a4c93;
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #ccc;
+}
+.btn-outline:hover {
+  border-color: #888;
+  color: #fff;
+}
+.btn-success {
+  background: #2ea043;
+  color: #fff;
+}
+
+/* toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2ea043;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+}
+
+/* 渐变模式下隐藏起止色标签 */
+.gradient-only {
+  display: none;
+}
+.mode-gradient .gradient-only {
+  display: flex;
+}
+
+/* 提示 */
+.tip {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 6px;
+}
+
+/* 取色按钮 */
+.eyedropper-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--input-bg);
+  color: #aaa;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.eyedropper-btn:hover {
+  border-color: #fff;
+  color: #fff;
+  background: #2a2a4a;
+}
+
+/* 色盘区域 */
+.color-wheel-section {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.wheel-toggle {
+  font-size: 0.85rem;
+  color: #aaa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.wheel-toggle:hover { color: #fff; }
+.wheel-toggle .arrow { transition: transform 0.2s; display: inline-block; font-size: 0.7rem; }
+.wheel-toggle.open .arrow { transform: rotate(90deg); }
+
+.wheel-body {
+  display: none;
+  margin-top: 10px;
+}
+.wheel-body.show { display: block; }
+
+.wheel-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.wheel-sv-box {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.wheel-sv-box canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.wheel-sv-cursor {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 4px rgba(0,0,0,.6);
+}
+.hue-slider-wrap {
+  position: relative;
+  width: 24px;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.hue-slider-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hue-cursor {
+  position: absolute;
+  left: -4px;
+  width: 28px;
+  height: 8px;
+  border-radius: 4px;
+  border: 2px solid #fff;
+  pointer-events: none;
+  transform: translateY(-50%);
+  box-shadow: 0 0 4px rgba(0,0,0,.6);
+}
+.wheel-preview {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.wheel-info {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 6px;
+}
+.wheel-active-label {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-bottom: 6px;
+}
+.wheel-active-label span {
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+/* 渐变模式下色盘目标指示 */
+.grad-target-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.grad-target-tab {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.grad-target-tab.active {
+  background: var(--accent2);
+  color: #fff;
+  border-color: var(--accent2);
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .container { gap: 14px; padding: 0; }
+  .card { padding: 14px; }
+  .preview-text { font-size: 1.5rem; }
+  .color-row { flex-wrap: wrap; }
+  .btn-row { flex-direction: column; }
+  .btn { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 头部 -->
+  <div class="header">
+    <h1>WC3 名字颜色生成器</h1>
+    <p>魔兽争霸3 富文本颜色代码 | 单色 / 渐变</p>
+  </div>
+
+  <!-- 模式 & 输入 -->
+  <div class="card" id="controlCard">
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="single" id="tabSingle">🎨 单色</button>
+      <button class="mode-tab" data-mode="gradient" id="tabGradient">🌈 渐变</button>
+    </div>
+
+    <div class="input-group">
+      <label>输入名字 / 文字</label>
+      <input type="text" id="textInput" value="祂说：狐惑亦可倾城" placeholder="请输入文字..." maxlength="60">
+    </div>
+
+    <!-- 单色颜色 -->
+    <div id="singleColorSection">
+      <div class="color-row">
+        <label>颜色</label>
+        <input type="color" id="singleColorPicker" value="#e94560">
+        <input type="text" class="hex-input" id="singleHex" value="#E94560" maxlength="7">
+        <button class="eyedropper-btn" id="singleEyeDropper" title="屏幕取色">💉</button>
+      </div>
+    </div>
+
+    <!-- 渐变颜色 -->
+    <div id="gradientColorSection" style="display:none;">
+      <div class="color-row">
+        <label>起始色</label>
+        <input type="color" id="gradStartPicker" value="#800080">
+        <input type="text" class="hex-input" id="gradStartHex" value="#800080" maxlength="7">
+        <button class="eyedropper-btn" id="gradStartEyeDropper" title="屏幕取色">💉</button>
+      </div>
+      <div class="color-row">
+        <label>结束色</label>
+        <input type="color" id="gradEndPicker" value="#FF9BAC">
+        <input type="text" class="hex-input" id="gradEndHex" value="#FF9BAC" maxlength="7">
+        <button class="eyedropper-btn" id="gradEndEyeDropper" title="屏幕取色">💉</button>
+      </div>
+      <button class="btn btn-outline" id="swapGradient" style="margin-top:4px;padding:6px 14px;font-size:0.8rem;">⇄ 交换方向</button>
+    </div>
+
+    <!-- 可视化色盘 -->
+    <div class="color-wheel-section" id="wheelSection">
+      <div class="wheel-toggle" id="wheelToggle">
+        <span class="arrow">▶</span> 高级取色 · 可视化色盘
+      </div>
+      <div class="wheel-body" id="wheelBody">
+        <div class="grad-target-tabs" id="gradTargetTabs" style="display:none;">
+          <button class="grad-target-tab active" data-target="start">起始色</button>
+          <button class="grad-target-tab" data-target="end">结束色</button>
+        </div>
+        <div class="wheel-row">
+          <div class="wheel-sv-box" id="svBox">
+            <canvas id="svCanvas" width="180" height="180"></canvas>
+            <div class="wheel-sv-cursor" id="svCursor"></div>
+          </div>
+          <div class="hue-slider-wrap" id="hueSlider">
+            <canvas id="hueCanvas" width="24" height="180"></canvas>
+            <div class="hue-cursor" id="hueCursor"></div>
+          </div>
+          <div class="wheel-preview" id="wheelPreview"></div>
+        </div>
+        <div class="wheel-info">拖拽色盘选色 · 色相条调色调 · 点击💉按钮从屏幕任意位置取色</div>
+      </div>
+    </div>
+
+    <!-- 预设色板 -->
+    <div class="presets">
+      <span class="preset-label">预设色板（点击应用）</span>
+    </div>
+  </div>
+
+  <!-- 预览 -->
+  <div class="card">
+    <div style="font-size:0.85rem;color:#aaa;margin-bottom:8px;">📺 实时预览</div>
+    <div class="preview-box" id="previewBox">
+      <span class="preview-text" id="previewText"></span>
+    </div>
+  </div>
+
+  <!-- 代码输出 -->
+  <div class="card">
+    <div style="font-size:0.85rem;color:#aaa;margin-bottom:8px;">📋 WC3 颜色代码</div>
+    <div class="code-box" id="codeBox"></div>
+    <div class="tip">点击上方代码框即可全选，或点击下方按钮复制</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnCopy">📋 复制代码</button>
+      <button class="btn btn-outline" id="btnReset">↺ 重置</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  // ── DOM 引用 ──
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+
+  const textInput = $('#textInput');
+  const singleColorPicker = $('#singleColorPicker');
+  const singleHex = $('#singleHex');
+  const gradStartPicker = $('#gradStartPicker');
+  const gradStartHex = $('#gradStartHex');
+  const gradEndPicker = $('#gradEndPicker');
+  const gradEndHex = $('#gradEndHex');
+  const previewText = $('#previewText');
+  const codeBox = $('#codeBox');
+  const toast = $('#toast');
+  const controlCard = $('#controlCard');
+  const tabSingle = $('#tabSingle');
+  const tabGradient = $('#tabGradient');
+  const singleSection = $('#singleColorSection');
+  const gradSection = $('#gradientColorSection');
+  const swapBtn = $('#swapGradient');
+  const presetsContainer = $('.presets');
+
+  let currentMode = 'single'; // 'single' | 'gradient'
+
+  // ── 色盘相关 DOM ──
+  const wheelSection = $('#wheelSection');
+  const wheelToggle = $('#wheelToggle');
+  const wheelBody = $('#wheelBody');
+  const svCanvas = $('#svCanvas');
+  const svCursor = $('#svCursor');
+  const svBox = $('#svBox');
+  const hueCanvas = $('#hueCanvas');
+  const hueCursor = $('#hueCursor');
+  const hueSlider = $('#hueSlider');
+  const wheelPreview = $('#wheelPreview');
+  const gradTargetTabs = $('#gradTargetTabs');
+
+  // ── 色盘状态 ──
+  let wheelHsv = { h: 0, s: 1, v: 1 };
+  let wheelTarget = 'single'; // 'single' | 'start' | 'end' — 色盘当前编辑的目标
+  let wheelDragging = null; // 'sv' | 'hue' | null
+
+  // HSV ↔ RGB
+  function hsvToRgb(h, s, v) {
+    const c = v * s;
+    const hp = h / 60;
+    const x = c * (1 - Math.abs((hp % 2) - 1));
+    const m = v - c;
+    let r1, g1, b1;
+    if (hp < 1)      { r1 = c; g1 = x; b1 = 0; }
+    else if (hp < 2) { r1 = x; g1 = c; b1 = 0; }
+    else if (hp < 3) { r1 = 0; g1 = c; b1 = x; }
+    else if (hp < 4) { r1 = 0; g1 = x; b1 = c; }
+    else if (hp < 5) { r1 = x; g1 = 0; b1 = c; }
+    else             { r1 = c; g1 = 0; b1 = x; }
+    return {
+      r: Math.round((r1 + m) * 255),
+      g: Math.round((g1 + m) * 255),
+      b: Math.round((b1 + m) * 255)
+    };
+  }
+
+  function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    const s = max === 0 ? 0 : d / max;
+    const v = max;
+    if (d !== 0) {
+      if (max === r)      h = ((g - b) / d + (g < b ? 6 : 0));
+      else if (max === g) h = ((b - r) / d + 2);
+      else                h = ((r - g) / d + 4);
+      h /= 6;
+    }
+    return { h: h * 360, s, v };
+  }
+
+  // ── 绘制色盘 ──
+  function drawSVSquare() {
+    const w = svCanvas.width, h = svCanvas.height;
+    const ctx = svCanvas.getContext('2d');
+    // 基础色：当前色相，满饱和满明度
+    const base = hsvToRgb(wheelHsv.h, 1, 1);
+    const baseStr = `rgb(${base.r},${base.g},${base.b})`;
+
+    // 水平渐变: 白色 → 纯色相(满饱和)
+    const gradH = ctx.createLinearGradient(0, 0, w, 0);
+    gradH.addColorStop(0, '#FFFFFF');
+    gradH.addColorStop(1, baseStr);
+    ctx.fillStyle = gradH;
+    ctx.fillRect(0, 0, w, h);
+
+    // 垂直渐变: 透明 → 黑色（覆盖在水平渐变上）
+    const gradV = ctx.createLinearGradient(0, 0, 0, h);
+    gradV.addColorStop(0, 'rgba(0,0,0,0)');
+    gradV.addColorStop(1, 'rgba(0,0,0,1)');
+    ctx.fillStyle = gradV;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function drawHueSlider() {
+    const w = hueCanvas.width, h = hueCanvas.height;
+    const ctx = hueCanvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    const stops = [0, 60, 120, 180, 240, 300, 360];
+    stops.forEach(deg => {
+      const rgb = hsvToRgb(deg, 1, 1);
+      grad.addColorStop(deg / 360, `rgb(${rgb.r},${rgb.g},${rgb.b})`);
+    });
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function updateWheelCursors() {
+    const svW = svBox.clientWidth, svH = svBox.clientHeight;
+    const hueH = hueSlider.clientHeight;
+
+    // SV: X=saturation, Y=1-value (Y倒转：顶=亮白)
+    svCursor.style.left = (wheelHsv.s * svW) + 'px';
+    svCursor.style.top = ((1 - wheelHsv.v) * svH) + 'px';
+
+    // Hue: Y 从0(h=0红) 到 hueH(h=360红)
+    hueCursor.style.top = ((wheelHsv.h / 360) * hueH) + 'px';
+
+    // 预览色块
+    const rgb = hsvToRgb(wheelHsv.h, wheelHsv.s, wheelHsv.v);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    wheelPreview.style.backgroundColor = hex;
+    // 游标颜色跟随
+    svCursor.style.backgroundColor = hex;
+    hueCursor.style.backgroundColor = hex;
+  }
+
+  function drawWheel() {
+    drawSVSquare();
+    drawHueSlider();
+    updateWheelCursors();
+  }
+
+  // ── 色盘交互 ──
+  function svFromEvent(e) {
+    const rect = svBox.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    return {
+      s: Math.max(0, Math.min(1, x / rect.width)),
+      v: Math.max(0, Math.min(1, 1 - y / rect.height))
+    };
+  }
+
+  function hueFromEvent(e) {
+    const rect = hueSlider.getBoundingClientRect();
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    return Math.max(0, Math.min(360, (y / rect.height) * 360));
+  }
+
+  function applyWheelToTarget() {
+    const rgb = hsvToRgb(wheelHsv.h, wheelHsv.s, wheelHsv.v);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    if (wheelTarget === 'single') {
+      setSingleColor(hex);
+    } else if (wheelTarget === 'start') {
+      setGradStartColor(hex);
+    } else {
+      setGradEndColor(hex);
+    }
+    updateAll();
+  }
+
+  function loadColorToWheel() {
+    let hex;
+    if (wheelTarget === 'single') {
+      hex = singleColorPicker.value;
+    } else if (wheelTarget === 'start') {
+      hex = gradStartPicker.value;
+    } else {
+      hex = gradEndPicker.value;
+    }
+    const rgb = hexToRgb(hex);
+    wheelHsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    drawWheel();
+  }
+
+  // SV 方块事件
+  svBox.addEventListener('mousedown', e => {
+    wheelDragging = 'sv';
+    const { s, v } = svFromEvent(e);
+    wheelHsv.s = s; wheelHsv.v = v;
+    drawWheel();
+    applyWheelToTarget();
+    e.preventDefault();
+  });
+  svBox.addEventListener('touchstart', e => {
+    wheelDragging = 'sv';
+    const { s, v } = svFromEvent(e);
+    wheelHsv.s = s; wheelHsv.v = v;
+    drawWheel();
+    applyWheelToTarget();
+    e.preventDefault();
+  });
+
+  // Hue 滑块事件
+  hueSlider.addEventListener('mousedown', e => {
+    wheelDragging = 'hue';
+    wheelHsv.h = hueFromEvent(e);
+    drawWheel();
+    applyWheelToTarget();
+    e.preventDefault();
+  });
+  hueSlider.addEventListener('touchstart', e => {
+    wheelDragging = 'hue';
+    wheelHsv.h = hueFromEvent(e);
+    drawWheel();
+    applyWheelToTarget();
+    e.preventDefault();
+  });
+
+  // 全局 move/up
+  document.addEventListener('mousemove', e => {
+    if (!wheelDragging) return;
+    if (wheelDragging === 'sv') {
+      const { s, v } = svFromEvent(e);
+      wheelHsv.s = s; wheelHsv.v = v;
+    } else if (wheelDragging === 'hue') {
+      wheelHsv.h = hueFromEvent(e);
+    }
+    drawWheel();
+    applyWheelToTarget();
+  });
+  document.addEventListener('touchmove', e => {
+    if (!wheelDragging) return;
+    if (wheelDragging === 'sv') {
+      const { s, v } = svFromEvent(e);
+      wheelHsv.s = s; wheelHsv.v = v;
+    } else if (wheelDragging === 'hue') {
+      wheelHsv.h = hueFromEvent(e);
+    }
+    drawWheel();
+    applyWheelToTarget();
+  });
+  document.addEventListener('mouseup', () => { wheelDragging = null; });
+  document.addEventListener('touchend', () => { wheelDragging = null; });
+
+  // ── 色盘折叠 ──
+  wheelToggle.addEventListener('click', () => {
+    const open = wheelBody.classList.toggle('show');
+    wheelToggle.classList.toggle('open', open);
+    if (open) {
+      loadColorToWheel();
+      drawWheel();
+    }
+  });
+
+  // ── 渐变目标切换 ──
+  gradTargetTabs.addEventListener('click', e => {
+    if (!e.target.classList.contains('grad-target-tab')) return;
+    gradTargetTabs.querySelectorAll('.grad-target-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    wheelTarget = e.target.dataset.target;
+    loadColorToWheel();
+    drawWheel();
+  });
+
+  // ── 屏幕取色 (EyeDropper API) ──
+  async function openEyeDropper(target) {
+    if (!window.EyeDropper) {
+      showToast('当前浏览器不支持屏幕取色，请使用 Chrome 95+ 或 Edge 95+');
+      return;
+    }
+    try {
+      const dropper = new EyeDropper();
+      const result = await dropper.open();
+      const hex = result.sRGBHex.toUpperCase();
+      if (target === 'single') {
+        setSingleColor(hex);
+        wheelTarget = 'single';
+      } else if (target === 'start') {
+        setGradStartColor(hex);
+        wheelTarget = 'start';
+      } else {
+        setGradEndColor(hex);
+        wheelTarget = 'end';
+      }
+      updateAll();
+      // 同步色盘
+      if (wheelBody.classList.contains('show')) {
+        loadColorToWheel();
+        drawWheel();
+      }
+      showToast('✅ 已取色：' + hex);
+    } catch (e) {
+      // 用户取消取色，忽略
+    }
+  }
+
+  $('#singleEyeDropper').addEventListener('click', () => openEyeDropper('single'));
+  $('#gradStartEyeDropper').addEventListener('click', () => openEyeDropper('start'));
+  $('#gradEndEyeDropper').addEventListener('click', () => openEyeDropper('end'));
+
+  // 不支持 EyeDropper 时隐藏按钮
+  if (!window.EyeDropper) {
+    ['singleEyeDropper', 'gradStartEyeDropper', 'gradEndEyeDropper'].forEach(id => {
+      const btn = $('#' + id);
+      if (btn) btn.style.display = 'none';
+    });
+  }
+
+  // ── 预设色板 ──
+  const presetColors = [
+    '#FF3333','#FF6B6B','#FF9BAC','#FFB6C1','#FF69B4',
+    '#E94560','#FF4500','#FF8C00','#FFD700','#FFDAB9',
+    '#FFE4E1','#FFF0F5','#FFFAFA','#FFEFD5','#F0E68C',
+    '#98FB98','#00FF7F','#00CED1','#87CEEB','#4169E1',
+    '#6A5ACD','#7B68EE','#9370DB','#BA55D3','#9932CC',
+    '#800080','#8B008B','#C71585','#DB7093','#A0522D',
+    '#8B4513','#DAA520','#CD853F','#BC8F8F','#DEB887',
+    '#F5DEB3','#D2B48C','#A9A9A9','#C0C0C0','#E0E0E0',
+    '#00FF00','#32CD32','#228B22','#00FA9A','#7CFC00',
+    '#1E90FF','#00BFFF','#87CEFA','#ADD8E6','#F0F8FF',
+    '#FF1493','#DC143C','#B22222','#8B0000','#2F4F4F',
+    '#191970','#000080','#0000CD','#4B0082','#483D8B',
+  ];
+
+  function buildPresets() {
+    // 移除旧的点
+    presetsContainer.querySelectorAll('.preset-dot').forEach(e => e.remove());
+    presetColors.forEach(hex => {
+      const dot = document.createElement('span');
+      dot.className = 'preset-dot';
+      dot.style.backgroundColor = hex;
+      dot.style.color = hex;
+      dot.title = hex;
+      dot.addEventListener('click', () => {
+        if (currentMode === 'single') {
+          setSingleColor(hex);
+        } else {
+          // 点第一个色设置起始色，再点设置结束色；按住 Shift 设置结束色
+          if (window.__presetNextIsEnd || (window._lastPresetTime && Date.now() - window._lastPresetTime < 800)) {
+            setGradEndColor(hex);
+            window.__presetNextIsEnd = false;
+          } else {
+            setGradStartColor(hex);
+            window.__presetNextIsEnd = true;
+          }
+          window._lastPresetTime = Date.now();
+        }
+        updateAll();
+      });
+      presetsContainer.appendChild(dot);
+    });
+  }
+
+  // ── 颜色工具 ──
+  function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    return {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16)
+    };
+  }
+
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x => {
+      const h = Math.round(Math.max(0, Math.min(255, x))).toString(16);
+      return h.length === 1 ? '0' + h : h;
+    }).join('').toUpperCase();
+  }
+
+  function interpolateColor(c1, c2, t) {
+    return {
+      r: c1.r + (c2.r - c1.r) * t,
+      g: c1.g + (c2.g - c1.g) * t,
+      b: c1.b + (c2.b - c1.b) * t
+    };
+  }
+
+  function wc3Tag(hex) {
+    return '|cff' + hex.replace('#', '').toLowerCase();
+  }
+
+  // ── 设置颜色 ──
+  function setSingleColor(hex) {
+    hex = hex.toUpperCase();
+    if (!hex.startsWith('#')) hex = '#' + hex;
+    singleColorPicker.value = hex;
+    singleHex.value = hex;
+    if (wheelBody.classList.contains('show') && wheelTarget === 'single') {
+      loadColorToWheel();
+      drawWheel();
+    }
+  }
+
+  function setGradStartColor(hex) {
+    hex = hex.toUpperCase();
+    if (!hex.startsWith('#')) hex = '#' + hex;
+    gradStartPicker.value = hex;
+    gradStartHex.value = hex;
+    if (wheelBody.classList.contains('show') && wheelTarget === 'start') {
+      loadColorToWheel();
+      drawWheel();
+    }
+  }
+
+  function setGradEndColor(hex) {
+    hex = hex.toUpperCase();
+    if (!hex.startsWith('#')) hex = '#' + hex;
+    gradEndPicker.value = hex;
+    gradEndHex.value = hex;
+    if (wheelBody.classList.contains('show') && wheelTarget === 'end') {
+      loadColorToWheel();
+      drawWheel();
+    }
+  }
+
+  // ── 模式切换 ──
+  function switchMode(mode) {
+    currentMode = mode;
+    if (mode === 'single') {
+      tabSingle.classList.add('active');
+      tabGradient.classList.remove('active');
+      singleSection.style.display = '';
+      gradSection.style.display = 'none';
+      controlCard.classList.remove('mode-gradient');
+      gradTargetTabs.style.display = 'none';
+      wheelTarget = 'single';
+    } else {
+      tabGradient.classList.add('active');
+      tabSingle.classList.remove('active');
+      singleSection.style.display = 'none';
+      gradSection.style.display = '';
+      controlCard.classList.add('mode-gradient');
+      gradTargetTabs.style.display = 'flex';
+      wheelTarget = 'start';
+    }
+    // 色盘打开时刷新
+    if (wheelBody.classList.contains('show')) {
+      loadColorToWheel();
+      drawWheel();
+    }
+    updateAll();
+  }
+
+  tabSingle.addEventListener('click', () => switchMode('single'));
+  tabGradient.addEventListener('click', () => switchMode('gradient'));
+
+  // ── 交换渐变方向 ──
+  swapBtn.addEventListener('click', () => {
+    const tmpPicker = gradStartPicker.value;
+    const tmpHex = gradStartHex.value;
+    setGradStartColor(gradEndPicker.value);
+    setGradEndColor(tmpPicker);
+    updateAll();
+  });
+
+  // ── 同步颜色选择器 ↔ hex 输入框 ──
+  singleColorPicker.addEventListener('input', () => {
+    singleHex.value = singleColorPicker.value.toUpperCase();
+    updateAll();
+  });
+  singleHex.addEventListener('input', () => {
+    let v = singleHex.value.trim();
+    if (!v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      singleColorPicker.value = v.toUpperCase();
+      updateAll();
+    }
+  });
+  singleHex.addEventListener('blur', () => {
+    singleHex.value = singleColorPicker.value.toUpperCase();
+  });
+
+  gradStartPicker.addEventListener('input', () => {
+    gradStartHex.value = gradStartPicker.value.toUpperCase();
+    updateAll();
+  });
+  gradStartHex.addEventListener('input', () => {
+    let v = gradStartHex.value.trim();
+    if (!v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      gradStartPicker.value = v.toUpperCase();
+      updateAll();
+    }
+  });
+  gradStartHex.addEventListener('blur', () => {
+    gradStartHex.value = gradStartPicker.value.toUpperCase();
+  });
+
+  gradEndPicker.addEventListener('input', () => {
+    gradEndHex.value = gradEndPicker.value.toUpperCase();
+    updateAll();
+  });
+  gradEndHex.addEventListener('input', () => {
+    let v = gradEndHex.value.trim();
+    if (!v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      gradEndPicker.value = v.toUpperCase();
+      updateAll();
+    }
+  });
+  gradEndHex.addEventListener('blur', () => {
+    gradEndHex.value = gradEndPicker.value.toUpperCase();
+  });
+
+  // ── 文字输入 ──
+  textInput.addEventListener('input', updateAll);
+
+  // ── 核心：更新预览和代码 ──
+  function updateAll() {
+    const text = textInput.value || '';
+    if (!text) {
+      previewText.innerHTML = '<span class="placeholder">输入文字查看效果</span>';
+      codeBox.textContent = '输入文字后生成 WC3 颜色代码...';
+      updateURL();
+      return;
+    }
+
+    let html = '';
+    let code = '';
+
+    if (currentMode === 'single') {
+      const hex = singleColorPicker.value;
+      const color = hex.replace('#', '').toLowerCase();
+      html = `<span style="color:${hex}">${escapeHtml(text)}</span>`;
+      code = `|cff${color}${text}|r`;
+    } else {
+      // 渐变模式
+      const chars = [...text];
+      const startColor = hexToRgb(gradStartPicker.value);
+      const endColor = hexToRgb(gradEndPicker.value);
+      const n = chars.length;
+
+      if (n === 1) {
+        const hex = rgbToHex(startColor.r, startColor.g, startColor.b);
+        html = `<span style="color:${hex}">${escapeHtml(chars[0])}</span>`;
+        code = `|cff${hex.replace('#', '').toLowerCase()}${chars[0]}|r`;
+      } else {
+        for (let i = 0; i < n; i++) {
+          const t = n === 1 ? 0 : i / (n - 1);
+          const c = interpolateColor(startColor, endColor, t);
+          const hex = rgbToHex(c.r, c.g, c.b);
+          html += `<span style="color:${hex}">${escapeHtml(chars[i])}</span>`;
+          code += `|cff${hex.replace('#', '').toLowerCase()}${chars[i]}|r`;
+        }
+      }
+    }
+
+    previewText.innerHTML = html;
+    codeBox.textContent = code;
+    updateURL();
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  // ── URL hash 同步 ──
+  function updateURL() {
+    const text = textInput.value;
+    const params = new URLSearchParams();
+    params.set('m', currentMode);
+    if (text) params.set('t', text);
+    if (currentMode === 'single') {
+      params.set('c', singleColorPicker.value.replace('#', ''));
+    } else {
+      params.set('cs', gradStartPicker.value.replace('#', ''));
+      params.set('ce', gradEndPicker.value.replace('#', ''));
+    }
+    const hash = params.toString();
+    if (window.location.hash !== '#' + hash) {
+      history.replaceState(null, '', '#' + hash);
+    }
+  }
+
+  function loadFromURL() {
+    const hash = window.location.hash.replace('#', '');
+    if (!hash) return;
+    const params = new URLSearchParams(hash);
+    const mode = params.get('m');
+    const text = params.get('t');
+    const c = params.get('c');
+    const cs = params.get('cs');
+    const ce = params.get('ce');
+
+    if (mode === 'gradient' || mode === 'single') {
+      switchMode(mode);
+    }
+    if (text) textInput.value = text;
+    if (c && currentMode === 'single') setSingleColor('#' + c);
+    if (cs && currentMode === 'gradient') setGradStartColor('#' + cs);
+    if (ce && currentMode === 'gradient') setGradEndColor('#' + ce);
+    updateAll();
+  }
+
+  window.addEventListener('hashchange', loadFromURL);
+
+  // ── 复制 ──
+  $('#btnCopy').addEventListener('click', async () => {
+    const code = codeBox.textContent;
+    if (!code || code.includes('输入文字')) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast('✅ 已复制！可直接粘贴到魔兽争霸3中使用');
+    } catch {
+      // fallback: select
+      const range = document.createRange();
+      range.selectNodeContents(codeBox);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      showToast('请手动 Ctrl+C 复制');
+    }
+  });
+
+  // ── 重置 ──
+  $('#btnReset').addEventListener('click', () => {
+    textInput.value = '其实这不是丁真';
+    setSingleColor('#E94560');
+    setGradStartColor('#800080');
+    setGradEndColor('#FF9BAC');
+    switchMode('single');
+    updateAll();
+    showToast('已重置为默认设置');
+  });
+
+  // ── Toast ──
+  let toastTimer;
+  function showToast(msg) {
+    clearTimeout(toastTimer);
+    toast.textContent = msg;
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  // ── 启动 ──
+  buildPresets();
+  loadFromURL();
+  // 如果 URL 没有参数，使用默认值渲染
+  if (!window.location.hash || window.location.hash === '#') {
+    updateAll();
+  }
+})();
+</script>
+
+</body>
+</html>
